@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Randomization Lookup</title>
+  <!-- Load PapaParse library to handle CSV parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      min-height: 20px;
+    }
+    .error {
+      color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Randomization Lookup</h2>
+
+  <form id="lookupForm">
+    <div class="form-group">
+      <label for="centreName">Centre Name:</label>
+      <input type="text" id="centreName" required placeholder="e.g. testcentre">
+    </div>
+
+    <div class="form-group">
+      <label for="rowNumber">Row Number (1, 2, 3...):</label>
+      <input type="number" id="rowNumber" min="1" required placeholder="e.g. 1">
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="result">Result will appear here...</div>
+
+  <script>
+    document.getElementById('lookupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const resultDiv = document.getElementById('result');
+      const centreInput = document.getElementById('centreName').value.trim();
+      const rowInput = parseInt(document.getElementById('rowNumber').value, 10);
+
+      if (!centreInput) {
+        resultDiv.innerHTML = '<span class="error">Please enter a centre name.</span>';
+        return;
+      }
+
+      // Build target filename dynamically based on input
+      const csvFileName = `randomization_test_4groups-${centreInput}.csv`;
+      
+      resultDiv.innerHTML = `Loading file: <em>${csvFileName}</em>...`;
+
+      // Fetch and parse the corresponding CSV file dynamically
+      Papa.parse(csvFileName, {
+        download: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          // Remove header row (index 0), retain data rows
+          const parsedData = results.data.slice(1);
+
+          if (parsedData.length === 0) {
+            resultDiv.innerHTML = `<span class="error">The file '${csvFileName}' is empty or missing data rows.</span>`;
+            return;
+          }
+
+          // Validate row range
+          if (isNaN(rowInput) || rowInput < 1 || rowInput > parsedData.length) {
+            resultDiv.innerHTML = `<span class="error">Invalid row number. Please enter a number between 1 and ${parsedData.length} for ${centreInput}.</span>`;
+            return;
+          }
+
+          // Convert 1-based input row to 0-based array index
+          const targetRow = parsedData[rowInput - 1];
+
+          // Extract 3rd column (index 2)
+          if (targetRow && targetRow.length >= 3) {
+            const columnValue = targetRow[2];
+            resultDiv.innerHTML = `<strong>Result (Row ${rowInput}, Column 3):</strong> ${columnValue}`;
+          } else {
+            resultDiv.innerHTML = `<span class="error">Row ${rowInput} does not contain a 3rd column.</span>`;
+          }
+        },
+        error: function(err) {
+          resultDiv.innerHTML = `<span class="error">Could not find or load file: <strong>${csvFileName}</strong>. Please verify the centre name.</span>`;
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
