@@ -55,17 +55,76 @@
 </head>
 <body>
 
-  <h2>Randomization Lookup</h2>
+  <h2>JADE-RRCT-CGM Randomization Lookup</h2>
+  <h5>A multi-centre JADE-Register based RCT (RRCT) to establish real-world evidence (RWE) for the optimal use of continuous glucose monitoring (CGM) system and its cost-effectiveness in people with diabetes.</h5>
 
   <form id="lookupForm">
-    <div class="form-group">
-      <label for="centreName">Centre Name:</label>
-      <input type="text" id="centreName" required placeholder="e.g. testcentre">
+    <!-- 1. Centre & Row Number -->
+    <div class="form-section">
+      <h3>1) Site & Record Selection</h3>
+      <div class="form-group">
+        <label for="centreName">Project Site:</label>
+        <input type="text" id="centreName" required placeholder="e.g. testcentre">
+      </div>
+      <div class="form-group">
+        <label for="rowNumber">Row Number (1, 2, 3...):</label>
+        <input type="number" id="rowNumber" min="1" required placeholder="e.g. 1">
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="rowNumber">Row Number (1, 2, 3...):</label>
-      <input type="number" id="rowNumber" min="1" required placeholder="e.g. 1">
+    <!-- 2. Patient Number -->
+    <div class="form-section">
+      <h3>2) Patient Identifier</h3>
+      <div class="form-group">
+        <label for="patientNo">ADF Patient No.:</label>
+        <input type="text" id="patientNo" required placeholder="Enter ADF Patient No.">
+      </div>
+    </div>
+
+    <!-- 3. Inclusion Criteria -->
+    <div class="form-section">
+      <h3>3) Inclusion Criteria</h3>
+      <p style="font-size:0.9em; color:#666;">As patients are enrolled in the JADE Register, eligible patients will be identified for participation in the JADE-RRCT-CGM if they have the following inclusion criteria:</p>
+      <div class="checkbox-group">
+        <label><input type="checkbox" class="inc-check" required> Physician-diagnosed T2D</label>
+        <label><input type="checkbox" class="inc-check" required> ≥18 years of age</label>
+        <label><input type="checkbox" class="inc-check" required> Willingness to wear CGM devices</label>
+        <label><input type="checkbox" class="inc-check" required> Have not used CGM in the last 6 months</label>
+        <label><input type="checkbox" class="inc-check" required> Willingness to sign informed consent form and adhere to protocol</label>
+        <label><input type="checkbox" class="inc-check" required> A1c ≥7.5% and one additional risk factor:</label>
+        <div class="sub-list">
+          - CKD (eGFR 15-60 ml/min/1.73m2)<br>
+          - Young-onset diabetes (YOD diagnosed ≤age of 40 years old)<br>
+          - On basal insulin treatment
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Exclusion Criteria -->
+    <div class="form-section">
+      <h3>4) Exclusion Criteria</h3>
+      <p style="font-size:0.9em; color:#d9534f;">Confirm that the patient meets NONE of the following criteria:</p>
+      <div class="checkbox-group">
+        <label><input type="checkbox" class="exc-check"> Young patients under 18 years old</label>
+        <label><input type="checkbox" class="exc-check"> Blood haemoglobin less than 9g/dL</label>
+        <label><input type="checkbox" class="exc-check"> Patients diagnosed with T1D, arbitrarily defined by ketotic presentation and continuous requirement of insulin within 12 months of diagnosis in the absence of biomarkers, such as islet autoantibodies or positive autoantibodies</label>
+        <label><input type="checkbox" class="exc-check"> Pregnancy or planning for pregnancy in the next 12 months</label>
+        <label><input type="checkbox" class="exc-check"> Patients planning for elective surgery in the next 12 months</label>
+        <label><input type="checkbox" class="exc-check"> Patients who are participating in other clinical trials</label>
+        <label><input type="checkbox" class="exc-check"> Patients with limited life expectancy or multiple morbidities or are unlikely to complete the 12-month RRCT</label>
+        <label><input type="checkbox" class="exc-check"> Patients who are illiterate</label>
+      </div>
+    </div>
+
+    <!-- 5. Declaration -->
+    <div class="form-section">
+      <h3>5) Declaration</h3>
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" id="declaration" required>
+          It is hereby declared that the information and particulars furnished above are true and correct to the best of my/our knowledge and belief and nothing has been concealed.
+        </label>
+      </div>
     </div>
 
     <button type="submit">Submit</button>
