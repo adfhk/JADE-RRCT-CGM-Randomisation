@@ -10,9 +10,25 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 500px;
+      max-width: 550px;
       margin: 40px auto;
       padding: 20px;
+      line-height: 1.5;
+    }
+
+    .form-section {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      background-color: #fafafa;
+    }
+
+    .form-section h3 {
+      margin-top: 0;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+      color: #333;
     }
 
     .form-group {
@@ -25,22 +41,39 @@
       font-weight: bold;
     }
 
+    .checkbox-group label {
+      font-weight: normal;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .checkbox-group input[type="checkbox"],
+    .checkbox-group input[type="radio"] {
+      margin-top: 3px;
+    }
+
     input[type="text"],
     input[type="number"] {
       width: 100%;
       padding: 8px;
       font-size: 16px;
       box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
 
     button {
-      padding: 10px 20px;
+      padding: 12px 20px;
       font-size: 16px;
       background-color: #007bff;
       color: white;
       border: none;
       cursor: pointer;
       border-radius: 4px;
+      width: 100%;
     }
 
     button:hover {
@@ -58,6 +91,11 @@
 
     .error {
       color: #d9534f;
+      font-weight: bold;
+    }
+
+    .success {
+      color: #28a745;
     }
   </style>
 </head>
@@ -73,7 +111,8 @@
     <div class="form-section">
       <h3>1) Site & Record Selection</h3>
       <div class="form-group">
-        <label for="centreName">Project Site:</label><select id="centreName" required
+        <label for="centreName">Project Site:</label>
+        <select id="centreName" required
           style="width: 100%; padding: 8px; font-size: 15px; border: 1px solid #ccc; border-radius: 4px;">
           <option value="">-- Select Centre --</option>
           <option value="testcentre">testcentre</option>
@@ -111,12 +150,11 @@
         <label><input type="checkbox" class="inc-check" required> A1c ≥7.5%</label>
         <div class="sub-list" style="margin-left: 25px; margin-top: 5px;">
           <p style="margin: 4px 0; font-weight: bold;">Select one additional risk factor:</p>
-          <label style="font-weight: normal;"><input type="radio" name="riskFactor" class="risk-radio" required> CKD
-            (eGFR 15-60 ml/min/1.73m2)</label>
-          <label style="font-weight: normal;"><input type="radio" name="riskFactor" class="risk-radio"> Young-onset
-            diabetes (YOD diagnosed ≤age of 40 years old)</label>
-          <label style="font-weight: normal;"><input type="radio" name="riskFactor" class="risk-radio"> On basal insulin
-            treatment</label>
+          <label><input type="radio" name="riskFactor" class="risk-radio" required> CKD (eGFR 15-60
+            ml/min/1.73m2)</label>
+          <label><input type="radio" name="riskFactor" class="risk-radio"> Young-onset diabetes (YOD diagnosed ≤age of
+            40 years old)</label>
+          <label><input type="radio" name="riskFactor" class="risk-radio"> On basal insulin treatment</label>
         </div>
       </div>
     </div>
@@ -147,13 +185,14 @@
       <h3>5) Declaration</h3>
       <div class="checkbox-group">
         <label>
+          <input type="checkbox" id="declaration" required>
           It is hereby declared that the information and particulars furnished above are true and correct to the best of
           my/our knowledge and belief and nothing has been concealed.
         </label>
       </div>
     </div>
 
-    <button type="submit">Submit</button>
+    <button type="submit">Submit & Fetch Allocation</button>
   </form>
 
   <div id="result">Result will appear here...</div>
@@ -165,49 +204,76 @@
       const resultDiv = document.getElementById('result');
       const centreInput = document.getElementById('centreName').value.trim();
       const rowInput = parseInt(document.getElementById('rowNumber').value, 10);
+      const patientNo = document.getElementById('patientNo').value.trim();
 
-      if (!centreInput) {
-        resultDiv.innerHTML = '<span class="error">Please enter a centre name.</span>';
+      // 1. Check Exclusion Criteria (If ANY are checked, reject immediately)
+      const exclusionChecks = document.querySelectorAll('.exc-check');
+      let isExcluded = false;
+      exclusionChecks.forEach(cb => {
+        if (cb.checked) isExcluded = true;
+      });
+
+      if (isExcluded) {
+        resultDiv.innerHTML = '<span class="error">The patient does not fulfill our requirements for randomization (exclusion criterion selected).</span>';
         return;
       }
 
-      // Build target filename dynamically based on input
+      // 2. Check Inclusion Criteria & Risk Factor
+      const inclusionChecks = document.querySelectorAll('.inc-check');
+      let allInclusionChecked = true;
+      inclusionChecks.forEach(cb => {
+        if (!cb.checked) allInclusionChecked = false;
+      });
+
+      const riskSelected = document.querySelector('input[name="riskFactor"]:checked');
+
+      if (!allInclusionChecked || !riskSelected) {
+        resultDiv.innerHTML = '<span class="error">Validation Failed: All inclusion criteria and one risk factor must be selected.</span>';
+        return;
+      }
+
+      // 3. Check Declaration
+      if (!document.getElementById('declaration').checked) {
+        resultDiv.innerHTML = '<span class="error">Validation Failed: Declaration must be signed before submission.</span>';
+        return;
+      }
+
+      // 4. Read & Parse CSV File
       const csvFileName = `randomization_test_4groups-${centreInput}.csv`;
+      resultDiv.innerHTML = `Validating criteria and loading file: <em>${csvFileName}</em>...`;
 
-      resultDiv.innerHTML = `Loading file: <em>${csvFileName}</em>...`;
-
-      // Fetch and parse the corresponding CSV file dynamically
       Papa.parse(csvFileName, {
         download: true,
         skipEmptyLines: true,
         complete: function (results) {
-          // Remove header row (index 0), retain data rows
-          const parsedData = results.data.slice(1);
+          const parsedData = results.data.slice(1); // Skip header row
 
           if (parsedData.length === 0) {
             resultDiv.innerHTML = `<span class="error">The file '${csvFileName}' is empty or missing data rows.</span>`;
             return;
           }
 
-          // Validate row range
           if (isNaN(rowInput) || rowInput < 1 || rowInput > parsedData.length) {
             resultDiv.innerHTML = `<span class="error">Invalid row number. Please enter a number between 1 and ${parsedData.length} for ${centreInput}.</span>`;
             return;
           }
 
-          // Convert 1-based input row to 0-based array index
           const targetRow = parsedData[rowInput - 1];
 
-          // Extract 3rd column (index 2)
           if (targetRow && targetRow.length >= 3) {
             const columnValue = targetRow[2];
-            resultDiv.innerHTML = `<strong>Result (Row ${rowInput}, Column 3):</strong> ${columnValue}`;
+            resultDiv.innerHTML = `
+              <div class="success">
+                <p><strong>Patient Identifier:</strong> ${patientNo}</p>
+                <p><strong>Allocation Group (Row ${rowInput}, Column 3):</strong> ${columnValue}</p>
+              </div>
+            `;
           } else {
             resultDiv.innerHTML = `<span class="error">Row ${rowInput} does not contain a 3rd column.</span>`;
           }
         },
         error: function (err) {
-          resultDiv.innerHTML = `<span class="error">Could not find or load file: <strong>${csvFileName}</strong>. Please verify the centre name.</span>`;
+          resultDiv.innerHTML = `<span class="error">Could not find or load file: <strong>${csvFileName}</strong>. Please check the site selection.</span>`;
         }
       });
     });
