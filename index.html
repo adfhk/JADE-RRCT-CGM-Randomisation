@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,14 +14,17 @@
       margin: 40px auto;
       padding: 20px;
     }
+
     .form-group {
       margin-bottom: 15px;
     }
+
     label {
       display: block;
       margin-bottom: 5px;
       font-weight: bold;
     }
+
     input[type="text"],
     input[type="number"] {
       width: 100%;
@@ -28,6 +32,7 @@
       font-size: 16px;
       box-sizing: border-box;
     }
+
     button {
       padding: 10px 20px;
       font-size: 16px;
@@ -37,9 +42,11 @@
       cursor: pointer;
       border-radius: 4px;
     }
+
     button:hover {
       background-color: #0056b3;
     }
+
     #result {
       margin-top: 20px;
       padding: 15px;
@@ -48,23 +55,31 @@
       background-color: #f9f9f9;
       min-height: 20px;
     }
+
     .error {
       color: #d9534f;
     }
   </style>
 </head>
+
 <body>
 
   <h2>JADE-RRCT-CGM Randomization Lookup</h2>
-  <h5>A multi-centre JADE-Register based RCT (RRCT) to establish real-world evidence (RWE) for the optimal use of continuous glucose monitoring (CGM) system and its cost-effectiveness in people with diabetes.</h5>
+  <h5>A multi-centre JADE-Register based RCT (RRCT) to establish real-world evidence (RWE) for the optimal use of
+    continuous glucose monitoring (CGM) system and its cost-effectiveness in people with diabetes.</h5>
 
   <form id="lookupForm">
     <!-- 1. Centre & Row Number -->
     <div class="form-section">
       <h3>1) Site & Record Selection</h3>
       <div class="form-group">
-        <label for="centreName">Project Site:</label>
-        <input type="text" id="centreName" required placeholder="e.g. testcentre">
+        <label for="centreName">Project Site:</label><select id="centreName" required
+          style="width: 100%; padding: 8px; font-size: 15px; border: 1px solid #ccc; border-radius: 4px;">
+          <option value="">-- Select Centre --</option>
+          <option value="testcentre">testcentre</option>
+          <option value="testcentre-a">testcentre2</option>
+          <option value="testcentre-b">testcentre3</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="rowNumber">Row Number (1, 2, 3...):</label>
@@ -84,18 +99,24 @@
     <!-- 3. Inclusion Criteria -->
     <div class="form-section">
       <h3>3) Inclusion Criteria</h3>
-      <p style="font-size:0.9em; color:#666;">As patients are enrolled in the JADE Register, eligible patients will be identified for participation in the JADE-RRCT-CGM if they have the following inclusion criteria:</p>
+      <p style="font-size:0.9em; color:#666;">As patients are enrolled in the JADE Register, eligible patients will be
+        identified for participation in the JADE-RRCT-CGM if they have the following inclusion criteria:</p>
       <div class="checkbox-group">
         <label><input type="checkbox" class="inc-check" required> Physician-diagnosed T2D</label>
         <label><input type="checkbox" class="inc-check" required> ≥18 years of age</label>
         <label><input type="checkbox" class="inc-check" required> Willingness to wear CGM devices</label>
         <label><input type="checkbox" class="inc-check" required> Have not used CGM in the last 6 months</label>
-        <label><input type="checkbox" class="inc-check" required> Willingness to sign informed consent form and adhere to protocol</label>
-        <label><input type="checkbox" class="inc-check" required> A1c ≥7.5% and one additional risk factor:</label>
-        <div class="sub-list">
-          - CKD (eGFR 15-60 ml/min/1.73m2)<br>
-          - Young-onset diabetes (YOD diagnosed ≤age of 40 years old)<br>
-          - On basal insulin treatment
+        <label><input type="checkbox" class="inc-check" required> Willingness to sign informed consent form and adhere
+          to protocol</label>
+        <label><input type="checkbox" class="inc-check" required> A1c ≥7.5%</label>
+        <div class="sub-list" style="margin-left: 25px; margin-top: 5px;">
+          <p style="margin: 4px 0; font-weight: bold;">Select one additional risk factor:</p>
+          <label style="font-weight: normal;"><input type="radio" name="riskFactor" class="risk-radio" required> CKD
+            (eGFR 15-60 ml/min/1.73m2)</label>
+          <label style="font-weight: normal;"><input type="radio" name="riskFactor" class="risk-radio"> Young-onset
+            diabetes (YOD diagnosed ≤age of 40 years old)</label>
+          <label style="font-weight: normal;"><input type="radio" name="riskFactor" class="risk-radio"> On basal insulin
+            treatment</label>
         </div>
       </div>
     </div>
@@ -107,11 +128,16 @@
       <div class="checkbox-group">
         <label><input type="checkbox" class="exc-check"> Young patients under 18 years old</label>
         <label><input type="checkbox" class="exc-check"> Blood haemoglobin less than 9g/dL</label>
-        <label><input type="checkbox" class="exc-check"> Patients diagnosed with T1D, arbitrarily defined by ketotic presentation and continuous requirement of insulin within 12 months of diagnosis in the absence of biomarkers, such as islet autoantibodies or positive autoantibodies</label>
-        <label><input type="checkbox" class="exc-check"> Pregnancy or planning for pregnancy in the next 12 months</label>
-        <label><input type="checkbox" class="exc-check"> Patients planning for elective surgery in the next 12 months</label>
+        <label><input type="checkbox" class="exc-check"> Patients diagnosed with T1D, arbitrarily defined by ketotic
+          presentation and continuous requirement of insulin within 12 months of diagnosis in the absence of biomarkers,
+          such as islet autoantibodies or positive autoantibodies</label>
+        <label><input type="checkbox" class="exc-check"> Pregnancy or planning for pregnancy in the next 12
+          months</label>
+        <label><input type="checkbox" class="exc-check"> Patients planning for elective surgery in the next 12
+          months</label>
         <label><input type="checkbox" class="exc-check"> Patients who are participating in other clinical trials</label>
-        <label><input type="checkbox" class="exc-check"> Patients with limited life expectancy or multiple morbidities or are unlikely to complete the 12-month RRCT</label>
+        <label><input type="checkbox" class="exc-check"> Patients with limited life expectancy or multiple morbidities
+          or are unlikely to complete the 12-month RRCT</label>
         <label><input type="checkbox" class="exc-check"> Patients who are illiterate</label>
       </div>
     </div>
@@ -121,8 +147,8 @@
       <h3>5) Declaration</h3>
       <div class="checkbox-group">
         <label>
-          <input type="checkbox" id="declaration" required>
-          It is hereby declared that the information and particulars furnished above are true and correct to the best of my/our knowledge and belief and nothing has been concealed.
+          It is hereby declared that the information and particulars furnished above are true and correct to the best of
+          my/our knowledge and belief and nothing has been concealed.
         </label>
       </div>
     </div>
@@ -133,9 +159,9 @@
   <div id="result">Result will appear here...</div>
 
   <script>
-    document.getElementById('lookupForm').addEventListener('submit', function(e) {
+    document.getElementById('lookupForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      
+
       const resultDiv = document.getElementById('result');
       const centreInput = document.getElementById('centreName').value.trim();
       const rowInput = parseInt(document.getElementById('rowNumber').value, 10);
@@ -147,14 +173,14 @@
 
       // Build target filename dynamically based on input
       const csvFileName = `randomization_test_4groups-${centreInput}.csv`;
-      
+
       resultDiv.innerHTML = `Loading file: <em>${csvFileName}</em>...`;
 
       // Fetch and parse the corresponding CSV file dynamically
       Papa.parse(csvFileName, {
         download: true,
         skipEmptyLines: true,
-        complete: function(results) {
+        complete: function (results) {
           // Remove header row (index 0), retain data rows
           const parsedData = results.data.slice(1);
 
@@ -180,7 +206,7 @@
             resultDiv.innerHTML = `<span class="error">Row ${rowInput} does not contain a 3rd column.</span>`;
           }
         },
-        error: function(err) {
+        error: function (err) {
           resultDiv.innerHTML = `<span class="error">Could not find or load file: <strong>${csvFileName}</strong>. Please verify the centre name.</span>`;
         }
       });
@@ -188,4 +214,5 @@
   </script>
 
 </body>
+
 </html>
